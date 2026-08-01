@@ -1,6 +1,9 @@
 <% layout("layouts/boilerplate.ejs") %>
 
 <h3>Events</h3>
+<form action="/events/new">
+    <button>Create event</button>
+</form>
 
 <%for(event of events) {%>
     <ul>
@@ -13,4 +16,7 @@
         <li><%= event.capacity %></li>
         <li><%= event.registrationDeadline %></li>
     </ul>
+    <form action="/events/<%= event._id %>/show">
+        <button>Show Event</button>
+    </form>
 <%}%>

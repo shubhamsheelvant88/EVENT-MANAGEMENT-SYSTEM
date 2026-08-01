@@ -1,0 +1,15 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+<form action="/events", method="POST">
+    <input name="event[title]" type="text" placeholder="Enter title">
+    <input name="event[description]" type="text" placeholder="Enter description">
+    <input name="event[category]" type="text" placeholder="Enter category">
+    <input name="event[date]" type="date">
+    <input name="event[time]" type="text" placeholder="Enter time">
+    <input name="event[venue]" type="text" placeholder="Enter venue">
+    <input name="event[organizer]" type="text" placeholder="Enter organizer name">
+    <input name="event[capacity]" type="number" placeholder="Enter capacity">
+    <input name="event[registrationDeadline]" type="date">
+    
+    <button>Create Event</button>
+</form>

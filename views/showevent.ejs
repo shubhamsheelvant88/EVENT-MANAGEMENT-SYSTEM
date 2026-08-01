@@ -1,0 +1,15 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+<ul>
+    <li><%= event.title %></li>
+    <li><%= event.description %></li>
+    <li><%= event.category %></li>
+    <li><%= event.date %></li>
+    <li><%= event.time %></li>
+    <li><%= event.organizer %></li>
+    <li><%= event.capacity %></li>
+    <li><%= event.registrationDeadline %></li>
+</ul>
+<form action="/events">
+    <button>Back to home page</button>
+</form>
