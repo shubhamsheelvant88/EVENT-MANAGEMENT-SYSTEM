@@ -1,0 +1,40 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+
+<div class="row mt-3">
+    <h1 class="col-6 offset-3">SignUp on Event mangement system</h1>
+    <div class="col-6 offset-3">
+        <form action="/signup" method="POST" >
+            <div class="mb-3">
+                <label for="username">Username</label>
+                <input name="name" type="text" id="username" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="email">Email</label>
+                <input name="email" type="email" id="email" required>  <!-- // inside listing title in key value pair -->
+            </div>
+
+            <div class="mb-3">
+                <label for="password">Password</label>
+                <input name="password" type="password" id="password" required>  <!-- // inside listing title in key value pair -->
+            </div>
+
+            <div class="mb-3">
+                <label for="usn">USN</label>
+                <input name="usn" type="text" id="usn" required>  <!-- // inside listing title in key value pair -->
+            </div>
+
+            <div class="mb-3">
+                <label for="dept">Department</label>
+                <input name="department" type="text" id="dept" required>  <!-- // inside listing title in key value pair -->
+            </div>
+
+            <div class="mb-3">
+                <label for="sem">Semester</label>
+                <input name="semester" type="number" id="sem" required>  <!-- // inside listing title in key value pair -->
+            </div>
+            <button type="submit" class="btn btn-success">signUp</button>
+        </form>
+    </div>
+</div>

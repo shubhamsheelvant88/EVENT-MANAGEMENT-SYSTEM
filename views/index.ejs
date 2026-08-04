@@ -1,6 +1,9 @@
 <% layout("layouts/boilerplate.ejs") %>
 
+
 <h3>Events</h3>
+<a href="/signup" >Sign up</a>
+<a href="/login">Login</a>
 <form action="/events/new">
     <button>Create event</button>
 </form>
@@ -18,5 +21,11 @@
     </ul>
     <form action="/events/<%= event._id %>/show">
         <button>Show Event</button>
+    </form>
+    <form action="/events/<%= event._id %>/edit">
+        <button>Edit event</button>
+    </form>
+    <form action="/events/<%= event._id %>?_method=DELETE" method="POST">
+        <button>Delete</button>
     </form>
 <%}%>

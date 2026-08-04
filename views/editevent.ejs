@@ -1,0 +1,17 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+<h3>Edit Form</h3>
+
+<form action="/events/<%= event._id %>?_method=PUT" method="POST">
+    <input name="event[title]" type="text" value="<%= event.title %>">
+    <input name="event[description]" type="text" value="<%= event.description %>">
+    <input name="event[category]" type="text" value="<%= event.category %>">
+    <input name="event[date]" type="date" value="<%= event.date.toISOString().split('T')[0] %>">
+    <input name="event[time]" type="text" value="<%= event.time %>">
+    <input name="event[venue]" type="text" value="<%= event.venue %>">
+    <input name="event[organizer]" type="text" value="<%= event.organizer %>">
+    <input name="event[capacity]" type="number" value="<%= event.capacity %>">
+    <input name="event[registrationDeadline]" type="date" value="<%= event.registrationDeadline.toISOString().split('T')[0] %>">
+    
+    <button>Edit Event</button>
+</form>
