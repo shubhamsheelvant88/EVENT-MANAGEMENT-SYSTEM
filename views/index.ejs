@@ -28,4 +28,13 @@
     <form action="/events/<%= event._id %>?_method=DELETE" method="POST">
         <button>Delete</button>
     </form>
+
+    <form action="/events/<%= event._id %>/register" method="POST">
+        <input
+        type="hidden"
+        name="studentId"
+        value="<%= user._id %>"
+    >
+        <button>Register for an event</button>
+    </form>
 <%}%>
