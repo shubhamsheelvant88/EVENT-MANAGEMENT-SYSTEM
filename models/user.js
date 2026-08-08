@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const passportLocalMongoose = require("passport-local-mongoose");
 
 const UserSchema = new Schema({ // schema
-    name: {
+    username: {
         type: String,
         required: true
     },
@@ -36,6 +36,6 @@ const UserSchema = new Schema({ // schema
     // }
 });
 
-UserSchema.plugin(passportLocalMongoose.default);
+UserSchema.plugin(passportLocalMongoose.default, { usernameField: "email" });
 
 module.exports = mongoose.model("User", UserSchema);

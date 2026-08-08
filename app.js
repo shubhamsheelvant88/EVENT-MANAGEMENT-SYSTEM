@@ -5,8 +5,11 @@ const path = require("path");
 const engine = require("ejs-mate")
 const Event = require("./models/event");
 const User = require("./models/user");
+const Registration = require("./models/registration");
 const wrapAsync = require("./utils/wrapasync")
 const methodOverride = require("method-override")
+const isLoggedIn = require("./middleware.js");
+
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session")
@@ -15,9 +18,10 @@ const flash = require("connect-flash")
 app.engine('ejs', engine)
 app.set('view engine', 'ejs');
 app.set("views", path.join(__dirname, "/views"));
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(methodOverride("_method"))
+app.use(express.static(path.join(__dirname, "public")))
 
 const sessionOptions = {
     secret : "mysupersecretcode",
@@ -47,11 +51,12 @@ app.use(flash())
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new LocalStrategy(User.authenticate()));
+passport.use(new LocalStrategy({ usernameField: 'email' }, User.authenticate('email')));
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+// Now the success and error can be used by the ejs 
 app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
@@ -70,7 +75,7 @@ app.get("/events", wrapAsync(async(req, res) => {
 }));
 
 // show particular event
-app.get("/events/:id/show", wrapAsync (async (req, res) => {
+app.get("/events/:id/show",isLoggedIn, wrapAsync (async (req, res) => {
     let {id} = req.params;
     let event = await Event.findById(id);
     res.render("showevent.ejs", {event});
@@ -78,85 +83,78 @@ app.get("/events/:id/show", wrapAsync (async (req, res) => {
 
 
 // create event rout
-app.get("/events/new", (req, res) => {
+app.get("/events/new",isLoggedIn, (req, res) => {
     res.render("createevent.ejs");
 });
 
-app.post("/events", wrapAsync( async (req, res) => {
+app.post("/events",isLoggedIn, wrapAsync( async (req, res) => {
     let newEvent = new Event(req.body.event);
     await newEvent.save();
     res.redirect("/events")
 }));
 
 // update rout
-app.get("/events/:id/edit", wrapAsync(async (req, res) => {
+app.get("/events/:id/edit",isLoggedIn, wrapAsync(async (req, res) => {
     let {id} = req.params;
     let event  = await Event.findById(id);
 
     res.render("editevent.ejs", {event});
 }));
 
-app.put("/events/:id", wrapAsync(async (req, res) => {
+app.put("/events/:id",isLoggedIn, wrapAsync(async (req, res) => {
     let {id} = req.params;
     let {event} = req.body;
     await Event.findByIdAndUpdate(id, event);
     res.redirect("/events");
 }));
 
-app.delete("/events/:id", wrapAsync(async (req, res) => {
+app.delete("/events/:id",isLoggedIn, wrapAsync(async (req, res) => {
     let {id} = req.params;
 
     await Event.findByIdAndDelete(id);
     res.redirect("/events");
 }));
 
-// app.get("/signup", (req, res) => {
-//     res.render("users/signup.ejs");
-// });
+app.get("/signup", (req, res) => {
+    res.render("users/signup.ejs");
+});
 
-// app.post("/signup", async (req, res, next) => {
-//     try {
-//     let  {username, usn, email, department, semester, password} = req.body;
+app.post("/signup", async (req, res) => {
+    try {
+    let {username, email, usn, department, semester, password} = req.body;
 
-//     const newUser = new User({name: username, usn, email, department, semester, username: username});
+    let newUser = new User({username, email, usn, department, semester});
 
-//     const registeredUser = await User.register(newUser, password);
-//     console.log(registeredUser);
+    const registeredUser = await User.register(newUser, password);
+    console.log(registeredUser);
+    req.login(registeredUser, (err) => {
+        if(err) {
+            return next(err);
+        }
+        req.flash("success", "Welcome to event management system!");
+        res.redirect("/events");
+    });
+    }catch(err) {
+        req.flash("error", err.message);
+        res.redirect("/signup");
+    }
+});
 
-//     req.login(registeredUser, (err) => {
-//         if(err) {
-//             return next(err);
-//         }
-//         req.flash("success", "Welcome to Event management system");
-//         res.redirect("/events");
-//     });
-//     }catch(err) {
-//         console.log(err);
-//         req.flash("error", err.message);
-//         res.redirect("/signup");
-//     }
-// });
+app.get("/login", (req, res) => {
+    res.render("users/login.ejs");
+});
 
-
-// app.get("/login", (req, res) => {
-//     res.render("users/login.ejs");
-// });
-
-// app.post("/login", passport.authenticate("local", {failureRedirect : "/login", failureFlash : true}), (req, res) => {
-//     req.flash("success", "Welcome to Wander Lust you are logged in");
-//     res.redirect("/events");
-// });
-
-// let isLoggedIn = (req, res, next) => {
-//     if(req.isAuthenticated() && req.user) {
-//         return next();
-//     }
-//     req.flash("error", "You need to be logged in to register for an event");
-//     res.redirect("/login");
-// };
+app.post("/login" ,passport.authenticate("local", {
+        failureRedirect: "/login",
+        failureFlash: true
+    }), (req, res) => {
+        console.log(req.body);
+        req.flash("success", "Welcome back!");
+        res.redirect("/events");
+    });
 
 // registration for an event
-app.post("/events/:id/register", wrapAsync(async (req, res) => {
+app.post("/events/:id/register",isLoggedIn, wrapAsync(async (req, res) => {
     let eventId = req.params.id; // event id from register 
     let studentId = req.user._id;
 
@@ -169,7 +167,7 @@ app.post("/events/:id/register", wrapAsync(async (req, res) => {
     }
 
     // already  registered
-    let existingRegistration = await Registration.findByOne({
+    let existingRegistration = await Registration.findOne({
         student : studentId,
         event : eventId,
         status : "registered"
@@ -177,7 +175,7 @@ app.post("/events/:id/register", wrapAsync(async (req, res) => {
 
     if(existingRegistration) {
         req.flash("error", "You are already registered for this event");
-        return res.redirect(`/events/${eventId}`);
+        return res.redirect(`/events/${eventId}/show`);
     }
 
     // countDocuments => counts the number of documents in particular 
@@ -188,8 +186,8 @@ app.post("/events/:id/register", wrapAsync(async (req, res) => {
     });
 
     if(registrationCount >= event.capacity) {
-        req.flash("success", "Sorry, this event is full!");
-        res.redirect("error", `/events/${eventId}`);
+        req.flash("error", "Sorry, this event is full!");
+        return res.redirect(`/events/${eventId}/show`);
     };
 
     await Registration.insertOne({
@@ -199,11 +197,19 @@ app.post("/events/:id/register", wrapAsync(async (req, res) => {
     });
 
     req.flash("success", "Successfully registered for the event!");
-    res.redirect(`/events/${eventId}`);
+    res.redirect(`/events/${eventId}/show`);
 
 }));
 
-
+app.get("/logout", (req, res) => {
+    req.logout((err) => {
+        if(err) {
+            return next(err);
+        }
+        req.flash("success", "You are logged out!");
+        res.redirect("/events");
+    });
+});
 
 app.listen(8080, () => {
     console.log("app is listening your port");

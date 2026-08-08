@@ -15,7 +15,7 @@ const registrationSchema = new Schema({
     },
     registeredAt: {
         type : Date,
-        default : Date,
+        default : Date.now,
     },
     status : {
         type : String,
@@ -24,4 +24,4 @@ const registrationSchema = new Schema({
     }
 });
 
-module.exports = mongoose.model(registrationSchema, "Registration");
+module.exports = mongoose.model("Registration", registrationSchema);
