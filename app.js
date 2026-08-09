@@ -211,6 +211,16 @@ app.get("/logout", (req, res) => {
     });
 });
 
+// my events 
+app.get("/my-events",isLoggedIn, wrapAsync( async (req, res) => {
+    const registrations = await Registration.find({
+        student : req.user._id,
+        status : "registered",
+    }).populate("event"); // takes the event id and returns the complete event document 
+
+    res.render("my-events.ejs", {registrations});
+}));
+
 app.listen(8080, () => {
     console.log("app is listening your port");
 });

@@ -1,0 +1,26 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+<h1>My Registered Events</h1>
+<br>
+<br>
+<%if(registrations.length == 0) {%>
+    <p>You haven't registered for any event yet!</p>
+<%}else {%>
+    <% registrations.forEach(registration => {%>
+        <div>
+            <h2>Title : 
+                <%= registration.event.title %>
+            </h2>
+            <p>Date : 
+                <%= registration.event.date %>
+            </p>
+            <p>Venue : 
+                <%= registration.event.venue %>
+            </p>
+        </div>
+        <hr>
+    <%})%>
+    <form action="/events/:id/cancel">
+        <button>Cancel regitration</button>
+    </form>
+<%}%>
