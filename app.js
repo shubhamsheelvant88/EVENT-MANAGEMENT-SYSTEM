@@ -221,6 +221,27 @@ app.get("/my-events",isLoggedIn, wrapAsync( async (req, res) => {
     res.render("my-events.ejs", {registrations});
 }));
 
+// cancel the registration 
+app.patch("/registrations/:id", isLoggedIn, wrapAsync(async (req, res) => {
+    const registration = await Registration.findById(req.params.id);
+
+    if(!registration) {
+        req.flash("error", "You have not registered for an event");
+        return res.redirect("/my-events");
+    }
+
+    if(!registration.student.equals(req.user._id)) {
+        req.flash("error", "Sorry, you cannot cancel this registration");
+        return res.redirect("/my-events");
+    }
+
+    registration.status = "cancelled";
+    await registration.save();
+
+    req.flash("success", "Registration cancelled successfully");
+    res.redirect("/my-events");
+}));
+
 app.listen(8080, () => {
     console.log("app is listening your port");
 });

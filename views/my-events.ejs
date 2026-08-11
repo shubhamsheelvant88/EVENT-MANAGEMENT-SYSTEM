@@ -18,9 +18,9 @@
                 <%= registration.event.venue %>
             </p>
         </div>
+        <form action="/registrations/<%= registration._id %>?_method=PATCH" method="POST">
+            <button>Cancel registration</button>
+        </form>
         <hr>
     <%})%>
-    <form action="/events/:id/cancel">
-        <button>Cancel regitration</button>
-    </form>
 <%}%>

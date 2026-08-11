@@ -10,6 +10,9 @@
     <li><%= event.capacity %></li>
     <li><%= event.registrationDeadline %></li>
 </ul>
+<form action="/events/<%= event._id %>/register" method="POST">
+        <button type="submit" >Register for an event</button>
+</form>
 <form action="/events">
     <button>Back to home page</button>
 </form>
