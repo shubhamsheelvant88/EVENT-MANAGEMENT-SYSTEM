@@ -35,15 +35,21 @@ const sessionOptions = {
 }
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/event_management_sys";
-main().then((res) => {
-    console.log("Connected to DB")
-})
-.catch((err) => console.log(err));
 
 async function main() {
-  await mongoose.connect(MONGO_URL);
+  try {
+    await mongoose.connect(MONGO_URL);
+    console.log("Connected to DB");
+    app.listen(8080, () => {
+      console.log("app is listening your port");
+    });
+  } catch (err) {
+    console.error("DB connection failed:", err);
+    process.exit(1);
+  }
 }
 
+main();
 
 app.use(session(sessionOptions))
 app.use(flash())
@@ -78,7 +84,12 @@ app.get("/events", wrapAsync(async(req, res) => {
 app.get("/events/:id/show",isLoggedIn, wrapAsync (async (req, res) => {
     let {id} = req.params;
     let event = await Event.findById(id);
-    res.render("showevent.ejs", {event});
+
+    const registrationCount = await Registration.countDocuments({
+        event : req.params.id,
+        status : "registered",
+    })
+    res.render("showevent.ejs", {event, registrationCount});
 }));
 
 
@@ -104,6 +115,7 @@ app.get("/events/:id/edit",isLoggedIn, wrapAsync(async (req, res) => {
 app.put("/events/:id",isLoggedIn, wrapAsync(async (req, res) => {
     let {id} = req.params;
     let {event} = req.body;
+
     await Event.findByIdAndUpdate(id, event);
     res.redirect("/events");
 }));
@@ -242,6 +254,30 @@ app.patch("/registrations/:id", isLoggedIn, wrapAsync(async (req, res) => {
     res.redirect("/my-events");
 }));
 
-app.listen(8080, () => {
-    console.log("app is listening your port");
-});
+// student dashboard 
+app.get("/dashboard",isLoggedIn, wrapAsync( async (req, res) => {
+    const student = req.user;
+
+    const registrations = await Registration.find({
+        student : req.user._id,
+        status : "registered",
+    }).populate("event");
+
+    const registeredEvents  = await Registration.countDocuments({
+        student : req.user._id,
+        status : "registered",
+    });
+
+    const cancelledCount = await Registration.countDocuments({
+        student : req.user._id,
+        status : "cancelled",
+    });
+
+    res.render("dashboard.ejs", {student, registrations, registeredEvents, cancelledCount});
+}));
+
+app.get("/profile", isLoggedIn, (req, res) => {
+    const student = req.user;
+
+    res.render("studentprofile.ejs", {student});
+})

@@ -10,9 +10,20 @@
     <li><%= event.capacity %></li>
     <li><%= event.registrationDeadline %></li>
 </ul>
+
+<% if(registrationCount >= event.capacity) { %>
+    <button class="btn btn-danger" disabled>Event Full</button>
+<%}else {%>
 <form action="/events/<%= event._id %>/register" method="POST">
         <button type="submit" >Register for an event</button>
 </form>
+<%}%>
+
+<br>
+<br>
+<b>Registered : </b><%= registrationCount %> / <%= event.capacity %>
+<br>
+<br>
 <form action="/events">
     <button>Back to home page</button>
 </form>

@@ -1,0 +1,58 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+<div class="container mt-5">
+    <h1>Hii, Welcome <%= student.username %></h1>
+
+    <p>
+        <%= student.department %>
+        |
+        Semester <%= student.semester %>
+    </p>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5>Registered Events</h5>
+
+                    <h2><%= registeredEvents %></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5>Cancelled</h5>
+
+                    <h2><%= cancelledCount %></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mt-5">My registered Events</h2>
+
+
+    <% if(registrations.length == 0) { %>
+        <p>You haven't registered for any events.</p>
+   <% } else { %>
+    <div class="row">
+        <% registrations.forEach(registration => { %>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title"><%= registration.event.title %></h2>
+                    <p><%= registration.event.description %></p>
+                    <p><%= registration.event.date %></p>
+                    <p><%= registration.event.venue %></p>
+                    <a href="/events/<%= registration.event._id %>/show" class="btn btn-primary">View Event</a>
+                </div>
+            </div>
+            </div>
+        <%}) %>
+    </div>
+   <%}%>
+</div>
