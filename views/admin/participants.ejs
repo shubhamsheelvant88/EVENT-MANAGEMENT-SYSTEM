@@ -1,0 +1,33 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+<div class="container mt-5">
+    <h1><%= event.title %> - Participants</h1>
+
+    <p>Total participants : <%= registrations.length %></p> 
+       <% if(registrations.length === 0) {%>
+    <div class="alert alert-info">No students registered for this event</div>
+       <% } else { %>
+        <table class="table table-bordered">
+    <thead>
+        <tr>
+        <th>Username</th>
+        <th>USN</th>
+        <th>Department</th>
+        <th>Semester</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% registrations.forEach(registration => { %>
+            <tr>
+            <td><%= registration.student.username %></td>
+            <td><%= registration.student.usn %></td>
+            <td><%= registration.student.department %></td>
+            <td><%= registration.student.semester %></td>
+            </tr>
+        <% }) %>
+    </tbody>
+    </table>
+   <% } %>
+
+</div>

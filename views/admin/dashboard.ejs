@@ -1,0 +1,78 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+<!-- <p><%= studentCount %></p>
+<p><%= eventCount %></p>
+<p><%= registrationCount %></p> -->
+
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Total students</h5>
+                
+                <h2><%= studentCount %></h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Events</h5>
+                
+                <h2><%= eventCount %></h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5>Registered Students</h5>
+                
+                <h2><%= registrationCount %></h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<h3>Events</h3>
+<form action="/events/new">
+    <button>Create event</button>
+</form>
+<!-- <form action="/my-events">
+    <button>My events</button>
+</form> -->
+
+<%for(event of events) {%>
+    <ul>
+        <li><%= event.title %></li>
+        <li><%= event.description %></li>
+        <li><%= event.category %></li>
+        <li><%= event.date %></li>
+        <li><%= event.time %></li>
+        <li><%= event.organizer %></li>
+        <li><%= event.capacity %></li>
+        <li><%= event.registrationDeadline %></li>
+    </ul>
+    <form action="/events/<%= event._id %>/show">
+        <button>Show Event</button>
+    </form>
+    <form action="/events/<%= event._id %>/edit">
+        <button>Edit event</button>
+    </form>
+    <form action="/events/<%= event._id %>?_method=DELETE" method="POST">
+        <button>Delete</button>
+    </form>
+    <form action="/admin/events/<%= event._id %>/participants">
+    <button>View participants</button>
+    </form>
+    <hr>
+<%}%>
+

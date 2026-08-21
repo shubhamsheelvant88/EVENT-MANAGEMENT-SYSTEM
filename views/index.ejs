@@ -5,11 +5,14 @@
 <a href="/signup" >Sign up</a>
 <a href="/login">Login</a>
 <a href="/logout">Log out</a>
-<form action="/events/new">
+<!-- <form action="/events/new">
     <button>Create event</button>
-</form>
+</form> -->
 <form action="/my-events">
     <button>My events</button>
+</form>
+<form action="/dashboard">
+    <button>Dashboard</button>
 </form>
 
 <%for(event of events) {%>
@@ -23,7 +26,8 @@
         <li><%= event.capacity %></li>
         <li><%= event.registrationDeadline %></li>
     </ul>
-    <form action="/events/<%= event._id %>/show">
+    <hr>
+    <!-- <form action="/events/<%= event._id %>/show">
         <button>Show Event</button>
     </form>
     <form action="/events/<%= event._id %>/edit">
@@ -31,5 +35,5 @@
     </form>
     <form action="/events/<%= event._id %>?_method=DELETE" method="POST">
         <button>Delete</button>
-    </form>
+    </form> -->
 <%}%>

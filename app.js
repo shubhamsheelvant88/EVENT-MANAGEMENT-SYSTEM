@@ -8,7 +8,7 @@ const User = require("./models/user");
 const Registration = require("./models/registration");
 const wrapAsync = require("./utils/wrapasync")
 const methodOverride = require("method-override")
-const isLoggedIn = require("./middleware.js");
+const { isLoggedIn, isAdmin } = require("./middleware.js");
 
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
@@ -40,9 +40,6 @@ async function main() {
   try {
     await mongoose.connect(MONGO_URL);
     console.log("Connected to DB");
-    app.listen(8080, () => {
-      console.log("app is listening your port");
-    });
   } catch (err) {
     console.error("DB connection failed:", err);
     process.exit(1);
@@ -213,7 +210,7 @@ app.post("/events/:id/register",isLoggedIn, wrapAsync(async (req, res) => {
 
 }));
 
-app.get("/logout", (req, res) => {
+app.get("/logout", (req, res, next) => {
     req.logout((err) => {
         if(err) {
             return next(err);
@@ -280,4 +277,45 @@ app.get("/profile", isLoggedIn, (req, res) => {
     const student = req.user;
 
     res.render("studentprofile.ejs", {student});
-})
+});
+
+app.get("/admin/dashboard", isAdmin, wrapAsync(async (req, res) => {
+    const studentCount = await User.countDocuments({
+        role : "student",
+    });
+
+    const eventCount = await Event.countDocuments();
+
+    const registrationCount = await Registration.countDocuments({
+        status : "registered",
+    });
+
+    // events 
+    let events = await Event.find();
+
+    res.render("admin/dashboard.ejs", {studentCount, eventCount, registrationCount, events});
+}));
+
+
+app.get("/admin/events/:id/participants", isAdmin,  wrapAsync( async (req, res) => {
+
+    const event = await Event.findById(req.params.id);
+
+    if(!event) {
+        req.flash("error", "Event not found!");
+        return res.redirect("/admin/dasboard")
+    }
+
+    const registrations = await Registration.find({
+        event : req.params.id,
+        status : "registered",
+    }).populate("student");
+
+    console.log(registrations);
+
+    res.render("admin/participants", {event, registrations});
+}));
+
+app.listen(8080, () => {
+    console.log("app is listening your port");
+});
