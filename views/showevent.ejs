@@ -14,9 +14,11 @@
 <% if(registrationCount >= event.capacity) { %>
     <button class="btn btn-danger" disabled>Event Full</button>
 <%}else {%>
-<form action="/events/<%= event._id %>/register" method="POST">
-        <button type="submit" >Register for an event</button>
-</form>
+    <%if(currUser && currUser.role === "student") {%>
+        <form action="/events/<%= event._id %>/register" method="POST">
+            <button type="submit" >Register for an event</button>
+        </form>
+    <%}%>
 <%}%>
 
 <br>

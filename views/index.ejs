@@ -8,12 +8,17 @@
 <!-- <form action="/events/new">
     <button>Create event</button>
 </form> -->
+
+<%if(currUser && currUser.role === "student") {%>
 <form action="/my-events">
     <button>My events</button>
 </form>
+<%}%>
+<%if(currUser && currUser.role === "student") {%>
 <form action="/dashboard">
     <button>Dashboard</button>
 </form>
+<%}%>
 
 <%for(event of events) {%>
     <ul>
@@ -26,14 +31,14 @@
         <li><%= event.capacity %></li>
         <li><%= event.registrationDeadline %></li>
     </ul>
-    <hr>
-    <!-- <form action="/events/<%= event._id %>/show">
-        <button>Show Event</button>
+    <form action="/events/<%= event._id %>/show">
+        <button>View Event</button>
     </form>
-    <form action="/events/<%= event._id %>/edit">
+    <!-- <form action="/events/<%= event._id %>/edit">
         <button>Edit event</button>
     </form>
     <form action="/events/<%= event._id %>?_method=DELETE" method="POST">
         <button>Delete</button>
     </form> -->
+    <hr>
 <%}%>

@@ -63,6 +63,7 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
+    res.locals.currUser = req.user;
     next();
 });
 
@@ -296,14 +297,13 @@ app.get("/admin/dashboard", isAdmin, wrapAsync(async (req, res) => {
     res.render("admin/dashboard.ejs", {studentCount, eventCount, registrationCount, events});
 }));
 
-
 app.get("/admin/events/:id/participants", isAdmin,  wrapAsync( async (req, res) => {
 
     const event = await Event.findById(req.params.id);
 
     if(!event) {
         req.flash("error", "Event not found!");
-        return res.redirect("/admin/dasboard")
+        return res.redirect("/admin/dashboard")
     }
 
     const registrations = await Registration.find({
@@ -314,6 +314,19 @@ app.get("/admin/events/:id/participants", isAdmin,  wrapAsync( async (req, res) 
     console.log(registrations);
 
     res.render("admin/participants", {event, registrations});
+}));
+
+app.get("/admin/students", isAdmin, wrapAsync( async (req, res) => {
+    const students = await User.find({
+        role : "student",
+    })
+
+    res.render("admin/students", {students});
+}));
+
+app.get("/admin/students/:id/view-student", isAdmin, wrapAsync(async (req, res) => {
+    const student = await User.findById(req.params.id);
+    res.render("admin/view-student", {student});
 }));
 
 app.listen(8080, () => {
