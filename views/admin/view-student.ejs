@@ -1,10 +1,44 @@
 <% layout("layouts/boilerplate.ejs") %>
+
+<div class="container mt-5">
 <h1>Student details : </h1>
 
-<ul>
-    <li>Name : <%= student.username %></li>
-    <li>Email : <%= student.email %></li>
-    <li>USN : <%= student.usn %></li>
-    <li>Department : <%= student.department %></li>
-    <li>Semester : <%= student.semester %></li>
-</ul>
+<div class="card mt-4">
+        <div class="card-body">
+
+            <h3><%= student.username %></h3>
+            <p>Email: <%= student.email %></p>
+            <p>USN: <%= student.usn %></p>
+            <p>Department: <%= student.department %></p>
+            <p>Semester: <%= student.semester %></p>
+
+        </div>
+    </div>
+
+<h2 class="mt-5">Registered Events</h2>
+
+<p>Total events : <%= registrations.length %></p>
+
+<% if(registrations.length == 0) { %>
+    <div class="alert alert-info">
+        This student has not registered for any events.
+    </div>
+<% } else { %>
+    <% registrations.forEach(registration => { %>
+    <div class="card mb-3">
+        <div class="card-body">
+            <% if (registration.event) { %>
+                <h4><%= registration.event.title %></h4>
+                <p><%= registration.event.description %></p>
+                <p><%= registration.event.date %></p>
+                <p><%= registration.event.venue %></p>
+            <% } else { %>
+                <h4 class="text-muted">[Deleted Event]</h4>
+                <p class="text-muted">This event has been removed.</p>
+            <% } %>
+        </div>
+    </div>
+    <% }) %>
+<%}%>
+</div>
+

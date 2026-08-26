@@ -122,6 +122,7 @@ app.delete("/events/:id",isLoggedIn, wrapAsync(async (req, res) => {
     let {id} = req.params;
 
     await Event.findByIdAndDelete(id);
+    await Registration.deleteMany({ event: id }); // if someone registred for the event tht is also removed
     res.redirect("/events");
 }));
 
@@ -298,7 +299,6 @@ app.get("/admin/dashboard", isAdmin, wrapAsync(async (req, res) => {
 }));
 
 app.get("/admin/events/:id/participants", isAdmin,  wrapAsync( async (req, res) => {
-
     const event = await Event.findById(req.params.id);
 
     if(!event) {
@@ -317,16 +317,51 @@ app.get("/admin/events/:id/participants", isAdmin,  wrapAsync( async (req, res) 
 }));
 
 app.get("/admin/students", isAdmin, wrapAsync( async (req, res) => {
-    const students = await User.find({
-        role : "student",
-    })
+    try {
+    let {search} = req.query;
+    let {department} = req.query;
+    let {semester} = req.query;
+    let students;
 
-    res.render("admin/students", {students});
+    let filter = {
+        role : "student",
+    }
+
+    if(search) {
+            // $or       → either condition can be true
+            // $regex    → search for a text pattern
+            // search    → the text entered by the user
+            // $options i → ignore uppercase/lowercase
+            filter.$or = [ // filter assigns 
+                {name : {$regex : search, $options : "i"}},
+                {usn : {$regex : search, $options : "i"}}
+            ]
+    }
+
+   if(department) {
+    filter.department = department; // assign the new department value
+   }
+
+   if(semester) {
+     filter.semester = Number(semester); // assign the new semester value in string
+    }
+
+    students = await User.find(filter);
+
+    res.render("admin/students", {students, search, department, semester});
+    } catch(err) {
+        req.flash("error", err.message);
+    }
 }));
 
 app.get("/admin/students/:id/view-student", isAdmin, wrapAsync(async (req, res) => {
     const student = await User.findById(req.params.id);
-    res.render("admin/view-student", {student});
+
+    const registrations = await Registration.find({
+        student : req.params.id
+    }).populate("event");
+
+    res.render("admin/view-student", {student, registrations});
 }));
 
 app.listen(8080, () => {

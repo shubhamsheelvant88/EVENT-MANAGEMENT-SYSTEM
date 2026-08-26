@@ -44,11 +44,13 @@
             <div class="col-md-4 mb-3">
                 <div class="card">
                 <div class="card-body">
+                    <% if(registration.event) { %>
                     <h2 class="card-title"><%= registration.event.title %></h2>
                     <p><%= registration.event.description %></p>
                     <p><%= registration.event.date %></p>
                     <p><%= registration.event.venue %></p>
                     <a href="/events/<%= registration.event._id %>/show" class="btn btn-primary">View Event</a>
+                    <%}%>
                 </div>
             </div>
             </div>

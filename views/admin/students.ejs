@@ -1,6 +1,56 @@
 <div class="container mt-5">
 <h1>Manage students</h1>
+
+<form action="/admin/students" method="GET">
+    <!-- Search -->
+    <input type="text" name="search" value="<%= search || '' %>" placeholder="Search by name or usn">
+
+    <!-- Filter -->
+     <select name="department">
+        <option value="">All Departments</option>
+
+        <option value="CSE"
+            <%= department === "CSE" ? "selected" : "" %>>CSE
+        </option>
+
+        <option value="AIML"
+            <%= department === "AIML" ? "selected" : "" %>>AIML
+        </option>
+
+        <option value="CIVIL"
+            <%= department === "CIVIL" ? "selected" : "" %>>CIVIL
+        </option>
+
+        <option value="ECE"
+            <%= department === "ECE" ? "selected" : "" %>>ECE
+        </option>
+     </select>
+
+     <select name="semester">
+        <option value="">All Semesters</option>
+
+        <option value="1" 
+            <%= semester === "1" ? "selected" : "" %>>1
+        </option>
+
+        <option value="2" 
+            <%= semester === "2" ? "selected" : "" %>>2
+        </option>
+
+        <option value="3" 
+            <%= semester === "3" ? "selected" : "" %>>3
+        </option>
+
+        <option value="4" 
+            <%= semester === "4" ? "selected" : "" %>>4
+        </option>
+     </select>
+
+     <button type="submit" class="btn btn-primary">Search / filter</button>
+</form>
+
 <p>Total students : <%= students.length %></p>
+
 <table class="table table-bordered">
     <thead>
         <tr>
