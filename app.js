@@ -161,7 +161,11 @@ app.post("/login" ,passport.authenticate("local", {
     }), (req, res) => {
         console.log(req.body);
         req.flash("success", "Welcome back!");
-        res.redirect("/events");
+        if(req.user.role === "admin") {
+            res.redirect("/admin/dashboard");
+        } else {
+            res.redirect("/events");
+        }
     });
 
 // registration for an event
@@ -211,16 +215,6 @@ app.post("/events/:id/register",isLoggedIn, wrapAsync(async (req, res) => {
     res.redirect(`/events/${eventId}/show`);
 
 }));
-
-app.get("/logout", (req, res, next) => {
-    req.logout((err) => {
-        if(err) {
-            return next(err);
-        }
-        req.flash("success", "You are logged out!");
-        res.redirect("/events");
-    });
-});
 
 // my events 
 app.get("/my-events",isLoggedIn, wrapAsync( async (req, res) => {
@@ -275,12 +269,14 @@ app.get("/dashboard",isLoggedIn, wrapAsync( async (req, res) => {
     res.render("dashboard.ejs", {student, registrations, registeredEvents, cancelledCount});
 }));
 
+// student profile
 app.get("/profile", isLoggedIn, (req, res) => {
     const student = req.user;
 
     res.render("studentprofile.ejs", {student});
 });
 
+// admin dashboard
 app.get("/admin/dashboard", isAdmin, wrapAsync(async (req, res) => {
     const studentCount = await User.countDocuments({
         role : "student",
@@ -298,6 +294,7 @@ app.get("/admin/dashboard", isAdmin, wrapAsync(async (req, res) => {
     res.render("admin/dashboard.ejs", {studentCount, eventCount, registrationCount, events});
 }));
 
+// participants
 app.get("/admin/events/:id/participants", isAdmin,  wrapAsync( async (req, res) => {
     const event = await Event.findById(req.params.id);
 
@@ -316,6 +313,7 @@ app.get("/admin/events/:id/participants", isAdmin,  wrapAsync( async (req, res) 
     res.render("admin/participants", {event, registrations});
 }));
 
+// how many students 
 app.get("/admin/students", isAdmin, wrapAsync( async (req, res) => {
     try {
     let {search} = req.query;
@@ -354,6 +352,7 @@ app.get("/admin/students", isAdmin, wrapAsync( async (req, res) => {
     }
 }));
 
+// manage students => view student
 app.get("/admin/students/:id/view-student", isAdmin, wrapAsync(async (req, res) => {
     const student = await User.findById(req.params.id);
 
@@ -363,6 +362,34 @@ app.get("/admin/students/:id/view-student", isAdmin, wrapAsync(async (req, res) 
 
     res.render("admin/view-student", {student, registrations});
 }));
+
+// manage events
+app.get("/admin/events", wrapAsync( async (req, res) => {
+    // events 
+    let events = await Event.find();
+    res.render("admin/events", {events});
+}));
+
+// manage view registrations
+app.get("/admin/registrations", wrapAsync ( async (req, res) => {
+
+    const registrations = await Registration.find({})
+    .populate("student")
+    .populate("event");
+
+    res.render("admin/registrations", {registrations});
+}));
+
+
+app.get("/logout", (req, res, next) => {
+    req.logout((err) => {
+        if(err) {
+            return next(err);
+        }
+        req.flash("success", "You are logged out!");
+        res.redirect("/login");
+    });
+});
 
 app.listen(8080, () => {
     console.log("app is listening your port");

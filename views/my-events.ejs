@@ -8,7 +8,8 @@
 <%}else {%>
     <% registrations.forEach(registration => {%>
         <div>
-            <h2>Title : 
+            <% if(registration.event) { %>
+                <h2>Title : 
                 <%= registration.event.title %>
             </h2>
             <p>Date : 
@@ -17,6 +18,7 @@
             <p>Venue : 
                 <%= registration.event.venue %>
             </p>
+            <% } %>
         </div>
         <form action="/registrations/<%= registration._id %>?_method=PATCH" method="POST">
             <button>Cancel registration</button>

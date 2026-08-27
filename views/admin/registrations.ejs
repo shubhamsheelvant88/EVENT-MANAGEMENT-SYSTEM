@@ -1,0 +1,48 @@
+<% layout("layouts/boilerplate.ejs") %>
+
+<div class="container mt-5">
+    <h1>All Registrations</h1>
+
+    <p class="text-muted">Total Registrations : <%= registrations.length %></p>
+
+    <% if(registrations.length == 0) { %>
+        <div class="alert alert-info">
+            No registrations found.
+        </div>
+    <% } else { %> 
+        <table class="table table-bordered table-hover mt-5">
+            <tr>
+                <th>Student</th>
+                <th>Email</th>
+                <th>USN</th>
+                <th>Department</th>
+                <th>Event</th>
+                <th>Date</th>
+                <th>Venue</th>
+                <th>Status</th>
+            </tr>
+            <tbody>
+               <% registrations.forEach(registration => { %>
+                <tr>
+                    <td> <%= registration.student.username %></td>
+
+                    <td><%= registration.student.email %></td>
+
+                    <td><%= registration.student.usn %></td>
+
+                    <td><%= registration.student.department %></td>
+                    <% if(registration.event) { %>
+                    <td><%= registration.event.title %></td>
+
+                    <td><%= registration.event.date %></td>
+
+                    <td><%= registration.event.venue %></td>
+
+                    <td><%= registration.status %></td>
+                    <% } %>
+                </tr>
+            <% }) %>
+            </tbody>
+        </table>
+    <% } %>
+</div>
