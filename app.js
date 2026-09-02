@@ -7,6 +7,7 @@ const Event = require("./models/event");
 const User = require("./models/user");
 const Registration = require("./models/registration");
 const wrapAsync = require("./utils/wrapasync")
+const getEventStatus = require("./utils/eventStatus")
 const methodOverride = require("method-override")
 const { isLoggedIn, isAdmin } = require("./middleware.js");
 
@@ -74,7 +75,12 @@ app.get("/", (req, res) => {
 
 // index rout
 app.get("/events", wrapAsync(async(req, res) => {
-    let events = await Event.find();
+    let events = await Event.find({});
+
+    events.forEach(event => { // event is upcoming, cancelled, or ongoing
+        event.calculatedStatus = getEventStatus(event.date);
+    });
+
     res.render("index.ejs", {events});
 }));
 
@@ -82,12 +88,25 @@ app.get("/events", wrapAsync(async(req, res) => {
 app.get("/events/:id/show",isLoggedIn, wrapAsync (async (req, res) => {
     let {id} = req.params;
     let event = await Event.findById(id);
+    
+    event.calculatedStatus = getEventStatus(event.date);
+
+    if(event.calculatedStatus === "Cancelled") {
+        req.flash("error", "This event has already been completed.");
+        return res.redirect(`/events/${event._id}`);
+    }
+
+    const isRegistered = await Registration.findOne({
+        student :  req.user._id,
+        event : req.params.id,
+    });
 
     const registrationCount = await Registration.countDocuments({
         event : req.params.id,
         status : "registered",
-    })
-    res.render("showevent.ejs", {event, registrationCount});
+    });
+
+    res.render("showevent.ejs", {event, registrationCount, isRegistered});
 }));
 
 
@@ -212,7 +231,7 @@ app.post("/events/:id/register",isLoggedIn, wrapAsync(async (req, res) => {
     });
 
     req.flash("success", "Successfully registered for the event!");
-    res.redirect(`/events/${eventId}/show`);
+    res.redirect("/my-events");
 
 }));
 
@@ -270,7 +289,7 @@ app.get("/dashboard",isLoggedIn, wrapAsync( async (req, res) => {
 }));
 
 // student profile
-app.get("/profile", isLoggedIn, (req, res) => {
+app.get("/profile",isLoggedIn, isLoggedIn, (req, res) => {
     const student = req.user;
 
     res.render("studentprofile.ejs", {student});
@@ -364,14 +383,14 @@ app.get("/admin/students/:id/view-student", isAdmin, wrapAsync(async (req, res) 
 }));
 
 // manage events
-app.get("/admin/events", wrapAsync( async (req, res) => {
+app.get("/admin/events", isAdmin, wrapAsync( async (req, res) => {
     // events 
     let events = await Event.find();
     res.render("admin/events", {events});
 }));
 
 // manage view registrations
-app.get("/admin/registrations", wrapAsync ( async (req, res) => {
+app.get("/admin/registrations", isAdmin, wrapAsync ( async (req, res) => {
 
     const registrations = await Registration.find({})
     .populate("student")

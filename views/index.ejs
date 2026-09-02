@@ -22,14 +22,15 @@
 
 <%for(event of events) {%>
     <ul>
-        <li><%= event.title %></li>
-        <li><%= event.description %></li>
-        <li><%= event.category %></li>
-        <li><%= event.date %></li>
-        <li><%= event.time %></li>
-        <li><%= event.organizer %></li>
-        <li><%= event.capacity %></li>
-        <li><%= event.registrationDeadline %></li>
+        <li>Title : <%= event.title %></li>
+        <li>Description : <%= event.description %></li>
+        <li>Category : <%= event.category %></li>
+        <li>Date : <%= event.date %></li>
+        <li>Time : <%= event.time %></li>
+        <li>Organiser : <%= event.organizer %></li>
+        <li>Capacity : <%= event.capacity %></li>
+        <li>Registration Deadline : <%= event.registrationDeadline %></li>
+        <li>Status : <%= event.calculatedStatus %></li>
     </ul>
     <form action="/events/<%= event._id %>/show">
         <button>View Event</button>

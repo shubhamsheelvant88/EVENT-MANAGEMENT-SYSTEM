@@ -14,16 +14,29 @@
 <% if(registrationCount >= event.capacity) { %>
     <button class="btn btn-danger" disabled>Event Full</button>
 <%}else {%>
-    <%if(currUser && currUser.role === "student") {%>
+    <%if(currUser && currUser.role === "student") { %>
+        <% if(isRegistered) { %>
+        <button class="btn btn-secondary" disabled>
+        Already Registered ✓
+    </button>
+        <% } else { %>
+<% if(event.capacity - registrationCount == 0) { %>
+    <button disabled>Event full</button>
+<% } else { %>
         <form action="/events/<%= event._id %>/register" method="POST">
-            <button type="submit" >Register for an event</button>
+            <button type="submit">Register for an event</button>
         </form>
+        <%}%>
+        <%}%>
     <%}%>
 <%}%>
 
 <br>
 <br>
-<b>Registered : </b><%= registrationCount %> / <%= event.capacity %>
+<p><b>Status : </b><%= event.calculatedStatus %></p>
+<p><b>Registered : </b><%= registrationCount %> / <%= event.capacity %></p>
+<p><b>Seats available : </b><%= event.capacity - registrationCount %></p>
+
 <br>
 <br>
 <form action="/events">
